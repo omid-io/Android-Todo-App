@@ -1,18 +1,41 @@
+# Gradle and Build Cache
+.gradle/
+build/
+*/build/
+.kotlin/
+
+# IDE / Android Studio / IntelliJ
+.idea/
 *.iml
-.gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
+*.iws
+*.ipr
 /captures
 .externalNativeBuild
 .cxx
+
+# Local Configuration and Environment Variables
 local.properties
 .env
+.env.*
+!.env.example
+
+# Keystores and Certificates
+*.jks
+*.keystore
 debug.keystore
+
+# Compiled Binaries & Packages
+*.apk
+*.aab
+*.dex
+*.class
+
+# Python & Node Scratch Artifacts
+__pycache__/
+*.py[cod]
+tools/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
