@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
@@ -495,7 +496,7 @@ fun TaskRowItem(
     onDelete: () -> Unit,
     onToggleSubtask: (Subtask) -> Unit
 ) {
-    var isExpanded by remember { mutableStateOf(true) }
+    var isExpanded by rememberSaveable(task.id) { mutableStateOf(true) }
     val hasSubtasks = subtasks.isNotEmpty()
     val completedSubtasksCount = subtasks.count { it.isCompleted }
     val progressFraction = if (hasSubtasks) completedSubtasksCount.toFloat() / subtasks.size else 0f

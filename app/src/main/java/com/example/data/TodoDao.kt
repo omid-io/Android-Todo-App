@@ -81,4 +81,7 @@ interface TodoDao {
 
     @Query("DELETE FROM subtasks WHERE taskId = :taskId")
     suspend fun deleteSubtasksByTaskId(taskId: Int)
+
+    @Query("DELETE FROM subtasks WHERE taskId IN (SELECT id FROM tasks WHERE categoryId = :categoryId)")
+    suspend fun deleteSubtasksByCategoryId(categoryId: Int)
 }

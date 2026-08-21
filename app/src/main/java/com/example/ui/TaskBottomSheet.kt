@@ -332,6 +332,17 @@ fun AddTaskSheet(
                                 onValueChange = { newSubtaskTitle = it },
                                 label = { Text(stringResource(R.string.subtask_title_label), fontSize = 12.sp) },
                                 singleLine = true,
+                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                    imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                                ),
+                                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                                    onDone = {
+                                        if (newSubtaskTitle.isNotBlank()) {
+                                            tempSubtasks.add(Subtask(taskId = taskToEdit?.id ?: 0, title = newSubtaskTitle.trim()))
+                                            newSubtaskTitle = ""
+                                        }
+                                    }
+                                ),
                                 shape = RoundedCornerShape(12.dp),
                                 textStyle = MaterialTheme.typography.bodySmall,
                                 colors = TextFieldDefaults.colors(

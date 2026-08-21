@@ -1,6 +1,6 @@
 # 📍 Project State — My Tasks (کارهای من)
 
-## 📌 Current Version: `1.0.1` (Build Code: 2)
+## 📌 Current Version: `1.0.2` (Build Code: 3)
 
 **Status:** Stable Release • Standalone Antigravity Development Mode
 
@@ -13,11 +13,13 @@
    - [x] Hierarchical subtasks with progress indicator and collapsible activity chains.
    - [x] Task ordering: newest tasks appended (`createdAt ASC`).
    - [x] Completed tasks section with collapsible header and counter badge.
+   - [x] Quick subtask input via keyboard Enter/Done action.
+   - [x] Subtask expansion state persistence across LazyColumn scroll (`rememberSaveable`).
 
 2. **Category Subsystem:**
    - [x] Custom color palettes (11 curated Material colors).
    - [x] Category reordering (`orderIndex` with Move Up / Down).
-   - [x] Rename & delete category with cascaded task removal.
+   - [x] Rename & delete category with cascaded task and orphan subtask removal (`deleteSubtasksByCategoryId`).
    - [x] Uncategorized tasks handling (`id: -1`).
 
 3. **Reminders & Notifications:**
@@ -28,12 +30,11 @@
    - [x] Dedicated reminder management screen with Xiaomi autostart & battery guide.
 
 4. **Localization & Calendars:**
-   - [x] Shamsi (Jalali) solar calendar date picker with 33-year leap year handling.
+   - [x] Shamsi (Jalali) solar calendar date picker covering years 1400–1420.
    - [x] Full Persian digits formatting (`۰-۹`).
    - [x] English / Persian dynamic runtime language switching (`RTL / LTR`).
 
-5. **AI Integration & Utility:**
-   - [x] Gemini AI natural language task parsing module ([`AiManager.kt`](file:///e:/programming/todoapp/app/src/main/java/com/example/util/AiManager.kt)).
+5. **Audio & Backup Utility:**
    - [x] Zero-latency sound feedback via `ToneGenerator` ([`SoundManager.kt`](file:///e:/programming/todoapp/app/src/main/java/com/example/util/SoundManager.kt)).
    - [x] JSON Backup export & SAF-based restore in Settings.
 
@@ -41,7 +42,6 @@
 
 ## 🚀 Active Roadmap & Upcoming Milestones (v1.1.0)
 
-- [ ] **Connect Magic AI FAB:** Wire [`MagicAiFab.kt`](file:///e:/programming/todoapp/app/src/main/java/com/example/ui/MagicAiFab.kt) and [`AiTaskBottomSheet.kt`](file:///e:/programming/todoapp/app/src/main/java/com/example/ui/AiTaskBottomSheet.kt) directly into [`MainTodoScreen.kt`](file:///e:/programming/todoapp/app/src/main/java/com/example/ui/MainTodoScreen.kt) with long-press trigger.
 - [ ] **Android 14+ Alarm Permission Prompt:** Add graceful prompt for `canScheduleExactAlarms()` if revoked by user.
-- [ ] **TDD Unit Testing Suite:** Expand automated unit tests for `JalaliCalendar`, `AiManager` mock responses, and recurrence timestamp calculations.
-- [ ] **Room ForeignKey Cascade Enforcement:** Strengthen SQLite foreign keys in schema.
+- [ ] **Glance Interactive Home Widget:** Home-screen widget for checking off daily tasks.
+- [ ] **Swipe Actions:** Swipe-to-complete and swipe-to-snooze gestures on task rows.

@@ -40,8 +40,9 @@ class TodoRepository(
     }
 
     suspend fun deleteCategory(category: Category) {
-        todoDao.deleteCategory(category)
+        todoDao.deleteSubtasksByCategoryId(category.id)
         todoDao.deleteTasksByCategoryId(category.id)
+        todoDao.deleteCategory(category)
         SoundManager.playDelete()
     }
 

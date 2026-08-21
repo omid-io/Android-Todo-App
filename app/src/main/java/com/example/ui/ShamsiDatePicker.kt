@@ -70,7 +70,7 @@ fun ShamsiDatePickerDialog(
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val months = (1..12).map { it to JalaliCalendar.getPersianMonthName(context, it) }
-    val years = (1405..1415).toList()
+    val years = (1400..1420).toList()
 
     val daysInMonth = when (selectedMonth) {
         in 1..6 -> 31

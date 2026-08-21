@@ -12,8 +12,6 @@ import com.example.data.Category
 import com.example.data.Subtask
 import com.example.data.Task
 import com.example.data.TodoRepository
-import com.example.util.AiManager
-import com.example.util.AiTaskResult
 import com.example.util.JalaliCalendar
 import com.example.util.SoundManager
 import com.squareup.moshi.Moshi
@@ -51,15 +49,6 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     val categories: StateFlow<List<Category>>
     val tasks: StateFlow<List<Task>>
     val subtasks: StateFlow<List<Subtask>>
-
-    private val _aiProcessedTasks = MutableStateFlow<List<AiTaskResult>>(emptyList())
-    val aiProcessedTasks: StateFlow<List<AiTaskResult>> = _aiProcessedTasks.asStateFlow()
-
-    private val _isAiProcessing = MutableStateFlow(false)
-    val isAiProcessing: StateFlow<Boolean> = _isAiProcessing.asStateFlow()
-
-    private val _aiErrorMessage = MutableStateFlow<String?>(null)
-    val aiErrorMessage: StateFlow<String?> = _aiErrorMessage.asStateFlow()
 
     init {
         val database = AppDatabase.getDatabase(application)
@@ -258,60 +247,6 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteCategory(category: Category) {
         viewModelScope.launch {
             repository.deleteCategory(category)
-        }
-    }
-
-    // --- AI Task Processing ---
-    fun processTasksWithAi(input: String) {
-        viewModelScope.launch {
-            _isAiProcessing.value = true
-            _aiErrorMessage.value = null
-            try {
-                val currentCategories = categories.value
-                val jalali = JalaliCalendar.getNowJalali()
-                val gregorian = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-                
-                val results = AiManager.processTasks(
-                    input = input,
-                    apiKey = "", // Uses BuildConfig.GEMINI_API_KEY as fallback
-                    modelName = "", // Uses default gemini-1.5-flash as fallback
-                    existingCategories = currentCategories,
-                    currentJalaliDate = jalali,
-                    currentGregorianDate = gregorian
-                )
-                _aiProcessedTasks.value = results
-            } catch (e: Exception) {
-                _aiErrorMessage.value = e.message ?: "Unknown error occurred"
-            } finally {
-                _isAiProcessing.value = false
-            }
-        }
-    }
-
-    fun clearAiResults() {
-        _aiProcessedTasks.value = emptyList()
-        _aiErrorMessage.value = null
-    }
-
-    fun addAllAiTasks() {
-        viewModelScope.launch {
-            val results = _aiProcessedTasks.value
-            results.forEach { result ->
-                // Try to find a matching category by name, else use uncategorized (-1)
-                val categoryId = categories.value.find { 
-                    it.name.equals(result.categoryName, ignoreCase = true) 
-                }?.id ?: -1
-                
-                addTask(
-                    title = result.title,
-                    description = result.description,
-                    categoryId = categoryId,
-                    reminderTime = result.reminderTime,
-                    repeatType = "none",
-                    subtasksList = result.subtasks
-                )
-            }
-            clearAiResults()
         }
     }
 
