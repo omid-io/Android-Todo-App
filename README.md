@@ -1,24 +1,21 @@
 <div align="center">
+  <img src="screenshots/logo.png" width="128" height="128" alt="My Tasks Logo" />
+  <h1>✨ My Tasks / کارهای من</h1>
+  <p><b>Ultra-Modern Glassmorphism Todo & Task Manager for Android</b></p>
 
-# ✨ My Tasks / کارهای من
-### Ultra-Modern Glassmorphism Todo & Task Manager for Android
+  <p>
+    <a href="#-my-tasks--modern-android-todo-app"><b>🇺🇸 English Documentation</b></a> • 
+    <a href="#-کارهای-من--اپلیکیشن-مدیریت-وظایف-اندروید"><b>🇮🇷 مستندات فارسی</b></a>
+  </p>
 
-<p align="center">
-  <a href="#-my-tasks--modern-android-todo-app"><b>🇺🇸 English Documentation</b></a> • 
-  <a href="#-کارهای-من--اپلیکیشن-مدیریت-وظایف-اندروید"><b>🇮🇷 مستندات فارسی</b></a>
-</p>
-
-<p align="center">
-  <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Kotlin-2.0.21-purple.svg?style=flat&logo=kotlin" alt="Kotlin 2.0.21" /></a>
-  <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg?style=flat&logo=jetpackcompose" alt="Jetpack Compose" /></a>
-  <a href="https://developer.android.com/training/data-storage/room"><img src="https://img.shields.io/badge/Room-Persistence-3DDC84.svg?style=flat&logo=android" alt="Room Persistence" /></a>
-  <a href="https://github.com/omid-io/Android-Todo-App/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-brightgreen.svg?style=flat&logo=githubactions" alt="CI/CD" /></a>
-  <a href="https://github.com/omid-io/Android-Todo-App/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.2-orange.svg?style=flat" alt="Latest Release" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="License MIT" /></a>
-</p>
-
-<img src="screenshots/logo.webp" width="120" height="120" alt="My Tasks Logo" />
-
+  <p>
+    <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Kotlin-2.0.21-purple.svg?style=flat&logo=kotlin" alt="Kotlin 2.0.21" /></a>
+    <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg?style=flat&logo=jetpackcompose" alt="Jetpack Compose" /></a>
+    <a href="https://developer.android.com/training/data-storage/room"><img src="https://img.shields.io/badge/Room-Persistence-3DDC84.svg?style=flat&logo=android" alt="Room Persistence" /></a>
+    <a href="https://github.com/omid-io/Android-Todo-App/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-brightgreen.svg?style=flat&logo=githubactions" alt="CI/CD" /></a>
+    <a href="https://github.com/omid-io/Android-Todo-App/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.2-orange.svg?style=flat" alt="Latest Release" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="License MIT" /></a>
+  </p>
 </div>
 
 ---
