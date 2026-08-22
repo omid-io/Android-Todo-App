@@ -111,7 +111,7 @@ fun SettingsBottomSheet(
                 icon = Icons.Rounded.CloudDownload,
                 title = stringResource(R.string.import_backup),
                 isDarkTheme = isDarkTheme,
-                onClick = { filePickerLauncher.launch("application/json") }
+                onClick = { filePickerLauncher.launch("*/*") }
             )
         }
     }

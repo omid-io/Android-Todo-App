@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Environment
 import android.widget.Toast
+import androidx.annotation.Keep
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.R
@@ -13,7 +14,9 @@ import com.example.data.Subtask
 import com.example.data.Task
 import com.example.data.TodoRepository
 import com.example.util.JalaliCalendar
+import com.example.util.ReminderScheduler
 import com.example.util.SoundManager
+import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
@@ -24,15 +27,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Keep
 data class BackupData(
-    val categories: List<Category>,
-    val tasks: List<Task>,
-    val subtasks: List<Subtask>
+    @Json(name = "categories") val categories: List<Category> = emptyList(),
+    @Json(name = "tasks") val tasks: List<Task> = emptyList(),
+    @Json(name = "subtasks") val subtasks: List<Subtask> = emptyList()
 )
 
 class TodoViewModel(application: Application) : AndroidViewModel(application) {
@@ -254,6 +259,104 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val backupAdapter = moshi.adapter(BackupData::class.java)
 
+    private fun parseBackupJson(json: String): BackupData? {
+        try {
+            val root = JSONObject(json)
+            val categories = mutableListOf<Category>()
+            val tasks = mutableListOf<Task>()
+            val subtasks = mutableListOf<Subtask>()
+
+            // 1. Categories (Standard: "categories", Obfuscated: "a")
+            val catArray = when {
+                root.has("categories") -> root.optJSONArray("categories")
+                root.has("a") -> root.optJSONArray("a")
+                else -> null
+            }
+            if (catArray != null) {
+                for (i in 0 until catArray.length()) {
+                    val obj = catArray.getJSONObject(i)
+                    val id = if (obj.has("id")) obj.optInt("id", 0) else obj.optInt("a", 0)
+                    val name = if (obj.has("name")) obj.optString("name", "") else obj.optString("b", "")
+                    val colorHex = if (obj.has("colorHex")) obj.optString("colorHex", "#94A3B8") else obj.optString("c", "#94A3B8")
+                    val isDefault = if (obj.has("isDefault")) obj.optBoolean("isDefault", false) else obj.optBoolean("d", false)
+                    val orderIndex = if (obj.has("orderIndex")) obj.optInt("orderIndex", 0) else obj.optInt("e", 0)
+                    if (name.isNotBlank()) {
+                        categories.add(Category(id, name, colorHex, isDefault, orderIndex))
+                    }
+                }
+            }
+
+            // 2. Tasks (Standard: "tasks", Obfuscated: "b")
+            val taskArray = when {
+                root.has("tasks") -> root.optJSONArray("tasks")
+                root.has("b") -> root.optJSONArray("b")
+                else -> null
+            }
+            if (taskArray != null) {
+                for (i in 0 until taskArray.length()) {
+                    val obj = taskArray.getJSONObject(i)
+                    val id = if (obj.has("id")) obj.optInt("id", 0) else obj.optInt("a", 0)
+                    val title = if (obj.has("title")) obj.optString("title", "") else obj.optString("b", "")
+                    val description = if (obj.has("description")) obj.optString("description", "") else obj.optString("c", "")
+                    val categoryId = if (obj.has("categoryId")) obj.optInt("categoryId", 0) else obj.optInt("d", 0)
+                    val isCompleted = if (obj.has("isCompleted")) obj.optBoolean("isCompleted", false) else obj.optBoolean("e", false)
+                    
+                    val reminderTime = when {
+                        obj.has("reminderTime") && !obj.isNull("reminderTime") -> obj.optLong("reminderTime")
+                        obj.has("f") && !obj.isNull("f") -> obj.optLong("f")
+                        else -> null
+                    }
+                    val repeatType = when {
+                        obj.has("repeatType") && !obj.isNull("repeatType") -> obj.optString("repeatType")
+                        obj.has("g") && !obj.isNull("g") -> obj.optString("g")
+                        else -> null
+                    }
+                    val createdAt = when {
+                        obj.has("createdAt") -> obj.optLong("createdAt", System.currentTimeMillis())
+                        obj.has("h") -> obj.optLong("h", System.currentTimeMillis())
+                        else -> System.currentTimeMillis()
+                    }
+                    
+                    if (title.isNotBlank()) {
+                        tasks.add(Task(id, title, description, categoryId, isCompleted, reminderTime, repeatType, createdAt))
+                    }
+                }
+            }
+
+            // 3. Subtasks (Standard: "subtasks", Obfuscated: "c")
+            val subArray = when {
+                root.has("subtasks") -> root.optJSONArray("subtasks")
+                root.has("c") -> root.optJSONArray("c")
+                else -> null
+            }
+            if (subArray != null) {
+                for (i in 0 until subArray.length()) {
+                    val obj = subArray.getJSONObject(i)
+                    val id = if (obj.has("id")) obj.optInt("id", 0) else obj.optInt("a", 0)
+                    val taskId = if (obj.has("taskId")) obj.optInt("taskId", 0) else obj.optInt("b", 0)
+                    val title = if (obj.has("title")) obj.optString("title", "") else obj.optString("c", "")
+                    val isCompleted = if (obj.has("isCompleted")) obj.optBoolean("isCompleted", false) else obj.optBoolean("d", false)
+                    if (title.isNotBlank()) {
+                        subtasks.add(Subtask(id, taskId, title, isCompleted))
+                    }
+                }
+            }
+
+            if (categories.isNotEmpty() || tasks.isNotEmpty() || subtasks.isNotEmpty()) {
+                return BackupData(categories, tasks, subtasks)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Fallback to standard Moshi parser
+        return try {
+            backupAdapter.fromJson(json)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun exportBackup() {
         viewModelScope.launch {
             try {
@@ -282,12 +385,18 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     fun importBackup(json: String) {
         viewModelScope.launch {
             try {
-                val data = backupAdapter.fromJson(json) ?: throw Exception("Invalid data")
+                val data = parseBackupJson(json) ?: throw Exception("Invalid data format")
                 
                 data.categories.forEach { repository.insertCategory(it) }
-                data.tasks.forEach { repository.insertTaskDirectly(it) }
+                data.tasks.forEach { task ->
+                    repository.insertTaskDirectly(task)
+                    if (!task.isCompleted && task.reminderTime != null && task.reminderTime > System.currentTimeMillis()) {
+                        ReminderScheduler.schedule(getApplication(), task)
+                    }
+                }
                 data.subtasks.forEach { repository.insertSubtask(it) }
                 
+                SoundManager.playSuccess()
                 Toast.makeText(getApplication(), getApplication<Application>().getString(R.string.restore_success), Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 e.printStackTrace()
