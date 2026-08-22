@@ -1,8 +1,11 @@
 package com.example.ui
 
 import android.app.Application
+import android.content.ContentValues
 import android.content.Context
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.lifecycle.AndroidViewModel
@@ -367,14 +370,36 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 val json = backupAdapter.toJson(data)
                 
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+                val fileName = "MyTasks_Backup_$timeStamp.json"
+                
                 withContext(Dispatchers.IO) {
-                    val fileName = "MyTasks_Backup_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.json"
-                    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    val file = File(downloadsDir, fileName)
-                    file.writeText(json)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val contentValues = ContentValues().apply {
+                            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                            put(MediaStore.MediaColumns.MIME_TYPE, "application/json")
+                            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                        }
+                        val resolver = getApplication<Application>().contentResolver
+                        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                            ?: throw Exception("Failed to create MediaStore entry in Downloads")
+                        resolver.openOutputStream(uri)?.use { stream ->
+                            stream.write(json.toByteArray(Charsets.UTF_8))
+                        }
+                    } else {
+                        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        if (!downloadsDir.exists()) downloadsDir.mkdirs()
+                        val file = File(downloadsDir, fileName)
+                        file.writeText(json, Charsets.UTF_8)
+                    }
                 }
                 
-                Toast.makeText(getApplication(), getApplication<Application>().getString(R.string.backup_success), Toast.LENGTH_LONG).show()
+                SoundManager.playSuccess()
+                Toast.makeText(
+                    getApplication(),
+                    "${getApplication<Application>().getString(R.string.backup_success)}\n$fileName",
+                    Toast.LENGTH_LONG
+                ).show()
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(getApplication(), getApplication<Application>().getString(R.string.backup_failed), Toast.LENGTH_LONG).show()

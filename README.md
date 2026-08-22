@@ -13,7 +13,7 @@
     <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg?style=flat&logo=jetpackcompose" alt="Jetpack Compose" /></a>
     <a href="https://developer.android.com/training/data-storage/room"><img src="https://img.shields.io/badge/Room-Persistence-3DDC84.svg?style=flat&logo=android" alt="Room Persistence" /></a>
     <a href="https://github.com/omid-io/Android-Todo-App/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-brightgreen.svg?style=flat&logo=githubactions" alt="CI/CD" /></a>
-    <a href="https://github.com/omid-io/Android-Todo-App/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.2-orange.svg?style=flat" alt="Latest Release" /></a>
+    <a href="https://github.com/omid-io/Android-Todo-App/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.3-orange.svg?style=flat" alt="Latest Release" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="License MIT" /></a>
   </p>
 </div>
@@ -116,7 +116,8 @@ You can build and test the application directly using the Gradle wrapper:
 
 | Release Version | Package File | Architecture | Min SDK | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **v1.0.2 (Latest)** | [`MyTasks-v1.0.2.apk`](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.2/MyTasks-v1.0.2.apk) | Universal | Android 7.0+ (API 24+) | ✅ GitHub CI/CD Passed |
+| **v1.0.3 (Latest)** | [`MyTasks-v1.0.3.apk`](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.3/MyTasks-v1.0.3.apk) | Universal | Android 7.0+ (API 24+) | ✅ GitHub CI/CD Passed |
+| **v1.0.2** | [`MyTasks-v1.0.2.apk`](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.2/MyTasks-v1.0.2.apk) | Universal | Android 7.0+ (API 24+) | ✅ GitHub CI/CD Passed |
 | **v1.0.1** | [`MyTasks-v1.0.1.apk`](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.1/MyTasks-v1.0.1.apk) | Universal | Android 7.0+ (API 24+) | ✅ GitHub CI/CD Passed |
 
 ---
@@ -135,8 +136,8 @@ You can build and test the application directly using the Gradle wrapper:
 * **🗓️ تقویم دوگانه هوشمند (شمسی و میلادی):** پیاده‌سازی موتور بومی و مستقل تقویم جلالی با محاسبه دقیق سال‌های کبیسه برای بازه سال‌های ۱۴۰۰ تا ۱۴۲۰ و تبدیل خودکار اعداد به ارقام فارسی.
 * **⏰ یادآورها و آلارم‌های دقیق:** تنظیم هشدارهای زمان‌بندی‌شده بدون خطا با `AlarmManager` با امکان تکرار (روزانه، هفتگی و روزهای دلخواه) به همراه دکمه‌های اقدام سریع در اعلان‌ها («انجام شد» و «به تعویق انداختن ۱۰ دقیقه‌ای»).
 * **📝 ساب‌تسک‌ها و ثبت سریع با کیبورد:** امکان تعریف بی‌نهایت زیرمجموعه کار برای هر تسک با نوار پیشرفت درصد انجام و ثبت سریع با زدن کلید اینتر کیبورد.
-* **💾 پشتیبان‌گیری و بازیابی آفلاین:** خروجی گرفتن کامل از اطلاعات به فرمت استاندارد JSON و امکان بازگردانی در هر زمان بدون نیاز به اتصال اینترنت یا سرور ثالث.
-* **🚀 خط لوله انتشار تمام‌اتوماتیک (CI/CD):** یکپارچه‌سازی کامل با سرورهای ابری GitHub Actions جهت کامپایل، تست، فشرده‌سازی با موتور R8 و انتشار خودکار پکیج‌های Release.
+* **💾 پشتیبان‌گیری و بازیابی آفلاین:** خروجی گرفتن خودکار با ثبت دقیق تاریخ و ساعت (Timestamped Backup)، عدم جایگزینی فایل‌های قبلی و امکان بازگردانی در هر زمان.
+* **🚀 خط لوله انتشار تمام‌اتوماتیک (CI/CD):** یکپارچه‌سازی کامل با سرورهای ابری GitHub Actions با امضای دائمی Keystore برای نصب و آپدیت آسان روی نسخه‌های قبلی.
 
 ---
 
@@ -155,7 +156,7 @@ You can build and test the application directly using the Gradle wrapper:
 
 شما می‌توانید همواره جدیدترین نسخه پکیج نصب برنامه را مستقیماً از صفحه [**Releaseهای گیت‌هاب**](https://github.com/omid-io/Android-Todo-App/releases) دریافت کنید:
 
-👉 **[دانلود نسخه v1.0.2 (جدیدترین نگارش)](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.2/MyTasks-v1.0.2.apk)**
+👉 **[دانلود نسخه v1.0.3 (جدیدترین نگارش)](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.3/MyTasks-v1.0.3.apk)**
 
 ---
 
