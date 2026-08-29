@@ -76,13 +76,11 @@ fun MainTodoScreen(
             onDeleteCategory = { cat ->
                 selectedCategoryForAction = cat
                 isCategoryActionDialogShown = true
-                isCategoryManagerShown = false
             },
             onAddCategoryClick = { isAddCategoryDialogShown = true },
             onEditCategoryClick = { cat ->
                 selectedCategoryForAction = cat
                 isEditCategoryNameDialogShown = true
-                isCategoryManagerShown = false
             },
             onMoveUp = { cat -> viewModel.moveCategoryUp(cat) },
             onMoveDown = { cat -> viewModel.moveCategoryDown(cat) }
@@ -332,7 +330,7 @@ fun MainTodoScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize().weight(1f).padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        contentPadding = PaddingValues(bottom = 100.dp)
+                        contentPadding = PaddingValues(bottom = 120.dp)
                     ) {
                         allCategoriesToDisplay.forEach { category ->
                             val catId = category.id
@@ -436,7 +434,8 @@ fun MainTodoScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 24.dp, bottom = 42.dp)
+                .navigationBarsPadding()
+                .padding(end = 24.dp, bottom = 24.dp)
                 .size(64.dp)
                 .glassFab(isDarkTheme = isDarkTheme)
                 .clickable { preSelectedCategoryId = null; onPlayTap(); isAddTaskSheetShown = true },

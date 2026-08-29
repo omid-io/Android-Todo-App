@@ -173,27 +173,95 @@ fun AddTaskSheet(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .verticalScroll(rememberScrollState())
                     .imePadding()
             ) {
-                // Header Row
+                // Top Action Bar with Save Button
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 14.dp, top = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.add_task_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isDark) Color.White else Color.Black
-                    )
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.size(32.dp).background(if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f), CircleShape)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.close), tint = if (isDark) Color.White else Color.Black, modifier = Modifier.size(18.dp))
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f), CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.close),
+                                tint = if (isDark) Color.White else Color.Black,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Text(
+                            text = stringResource(if (taskToEdit != null) R.string.edit_task else R.string.add_task_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isDark) Color.White else Color.Black
+                        )
+                    }
+
+                    // Top Primary Save Pill Button
+                    val isSaveActive = title.isNotBlank()
+                    Button(
+                        onClick = {
+                            if (isSaveActive) {
+                                var finalReminderTime: Long? = null
+                                if (isReminderEnabled) {
+                                    val cal = JalaliCalendar.j2g(jalaliYear, jalaliMonth, jalaliDay)
+                                    cal.set(Calendar.HOUR_OF_DAY, hour)
+                                    cal.set(Calendar.MINUTE, minute)
+                                    cal.set(Calendar.SECOND, 0)
+                                    cal.set(Calendar.MILLISECOND, 0)
+                                    finalReminderTime = cal.timeInMillis
+                                }
+
+                                val finalRepeatType = if (isReminderEnabled) {
+                                    if (repeatType == "every_other_day") "every_other_day:$everyXDays"
+                                    else repeatType
+                                } else null
+
+                                onSave(
+                                    taskToEdit?.id,
+                                    title.trim(),
+                                    description.trim(),
+                                    selectedCategoryId,
+                                    finalReminderTime,
+                                    finalRepeatType,
+                                    tempSubtasks.toList()
+                                )
+                                onDismiss()
+                            }
+                        },
+                        enabled = isSaveActive,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = Color.White,
+                            disabledContainerColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.06f),
+                            disabledContentColor = if (isDark) Color.White.copy(alpha = 0.35f) else Color.Black.copy(alpha = 0.25f)
+                        ),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
+                        modifier = Modifier.height(38.dp)
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.save),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        )
                     }
                 }
 
@@ -576,58 +644,7 @@ fun AddTaskSheet(
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Bottom Action buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.weight(1f).height(48.dp)
-                    ) {
-                        Text(stringResource(R.string.cancel), fontSize = 14.sp)
-                    }
-
-                    Button(
-                        onClick = {
-                            if (title.isNotBlank()) {
-                                var finalReminderTime: Long? = null
-                                if (isReminderEnabled) {
-                                    val cal = JalaliCalendar.j2g(jalaliYear, jalaliMonth, jalaliDay)
-                                    cal.set(Calendar.HOUR_OF_DAY, hour)
-                                    cal.set(Calendar.MINUTE, minute)
-                                    cal.set(Calendar.SECOND, 0)
-                                    cal.set(Calendar.MILLISECOND, 0)
-                                    finalReminderTime = cal.timeInMillis
-                                }
-
-                                val finalRepeatType = if (isReminderEnabled) {
-                                    if (repeatType == "every_other_day") "every_other_day:$everyXDays"
-                                    else repeatType
-                                } else null
-
-                                onSave(
-                                    taskToEdit?.id,
-                                    title.trim(),
-                                    description.trim(),
-                                    selectedCategoryId,
-                                    finalReminderTime,
-                                    finalRepeatType,
-                                    tempSubtasks.toList()
-                                )
-                                onDismiss()
-                            }
-                        },
-                        enabled = title.isNotBlank(),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.weight(1f).height(48.dp)
-                    ) {
-                        Text(stringResource(R.string.save_task), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    }
-                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
