@@ -1,6 +1,6 @@
 # 📍 Project State — My Tasks (کارهای من)
 
-## 📌 Current Version: `1.0.3` (Build Code: 4)
+## 📌 Current Version: `1.0.4` (Build Code: 5)
 
 **Status:** Stable Release • Standalone Antigravity Development Mode
 
