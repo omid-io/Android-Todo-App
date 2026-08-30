@@ -137,7 +137,10 @@ fun MainTodoScreen(
         val layoutDirection = if (locale.language == "fa") androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
         androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection) {
             AlertDialog(
-                onDismissRequest = { isCategoryActionDialogShown = false },
+                onDismissRequest = {
+                    isCategoryActionDialogShown = false
+                    selectedCategoryForAction = null
+                },
                 title = { Text(stringResource(R.string.manage_category_prefix) + " " + cat.name, fontWeight = FontWeight.Bold, fontSize = 16.sp) },
                 text = { Text(stringResource(R.string.category_options_desc)) },
                 confirmButton = {
@@ -156,13 +159,17 @@ fun MainTodoScreen(
                             onClick = {
                                 viewModel.deleteCategory(cat)
                                 isCategoryActionDialogShown = false
+                                selectedCategoryForAction = null
                             },
                             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text(stringResource(R.string.delete_category))
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        TextButton(onClick = { isCategoryActionDialogShown = false }) {
+                        TextButton(onClick = {
+                            isCategoryActionDialogShown = false
+                            selectedCategoryForAction = null
+                        }) {
                             Text(stringResource(R.string.cancel))
                         }
                     }
@@ -171,45 +178,20 @@ fun MainTodoScreen(
         }
     }
 
-    // Edit Category Name Dialog
+    // Edit Category Dialog (Name & Color)
     if (isEditCategoryNameDialogShown && selectedCategoryForAction != null) {
-        val cat = selectedCategoryForAction!!
-        var newName by remember { mutableStateOf(cat.name) }
-        val locale = java.util.Locale.getDefault()
-        val layoutDirection = if (locale.language == "fa") androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr
-        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection) {
-            AlertDialog(
-                onDismissRequest = { isEditCategoryNameDialogShown = false },
-                title = { Text(stringResource(R.string.edit_category_title), fontWeight = FontWeight.Bold) },
-                text = {
-                    OutlinedTextField(
-                        value = newName,
-                        onValueChange = { newName = it },
-                        label = { Text(stringResource(R.string.new_name)) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            if (newName.isNotBlank()) {
-                                viewModel.updateCategory(cat.copy(name = newName.trim()))
-                                isEditCategoryNameDialogShown = false
-                            }
-                        },
-                        enabled = newName.isNotBlank()
-                    ) {
-                        Text(stringResource(R.string.save))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { isEditCategoryNameDialogShown = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                }
-            )
-        }
+        EditCategoryDialog(
+            category = selectedCategoryForAction!!,
+            onDismiss = {
+                isEditCategoryNameDialogShown = false
+                selectedCategoryForAction = null
+            },
+            onSave = { updatedCat ->
+                viewModel.updateCategory(updatedCat)
+                isEditCategoryNameDialogShown = false
+                selectedCategoryForAction = null
+            }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

@@ -39,6 +39,10 @@ class TodoRepository(
         todoDao.updateCategory(category)
     }
 
+    suspend fun updateCategories(categories: List<Category>) {
+        todoDao.updateCategories(categories)
+    }
+
     suspend fun deleteCategory(category: Category) {
         todoDao.deleteSubtasksByCategoryId(category.id)
         todoDao.deleteTasksByCategoryId(category.id)

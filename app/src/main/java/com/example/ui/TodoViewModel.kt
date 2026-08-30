@@ -217,11 +217,10 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateAllCategoryOrders(orderedList: List<Category>) {
         viewModelScope.launch {
-            orderedList.forEachIndexed { i, cat ->
-                if (cat.orderIndex != i) {
-                    repository.updateCategory(cat.copy(orderIndex = i))
-                }
+            val updated = orderedList.mapIndexed { i, cat ->
+                cat.copy(orderIndex = i)
             }
+            repository.updateCategories(updated)
         }
     }
 
@@ -231,11 +230,10 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
             if (fromIndex in list.indices && toIndex in list.indices && fromIndex != toIndex) {
                 val item = list.removeAt(fromIndex)
                 list.add(toIndex, item)
-                list.forEachIndexed { i, cat ->
-                    if (cat.orderIndex != i) {
-                        repository.updateCategory(cat.copy(orderIndex = i))
-                    }
+                val updated = list.mapIndexed { i, cat ->
+                    cat.copy(orderIndex = i)
                 }
+                repository.updateCategories(updated)
                 SoundManager.playTap()
             }
         }

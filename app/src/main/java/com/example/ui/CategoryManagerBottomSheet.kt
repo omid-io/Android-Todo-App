@@ -9,7 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,15 +46,20 @@ fun CategoryManagerBottomSheet(
     isDarkTheme: Boolean = true
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val categoryList = remember(categories) {
-        mutableStateListOf<Category>().apply {
-            addAll(categories.filter { it.id != -1 })
-        }
-    }
+    val lazyListState = rememberLazyListState()
+    val categoryList = remember { mutableStateListOf<Category>() }
 
-    var draggingIndex by remember { mutableStateOf<Int?>(null) }
+    var draggedItemId by remember { mutableStateOf<Int?>(null) }
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
     val itemHeightPx = with(LocalDensity.current) { 62.dp.toPx() }
+
+    LaunchedEffect(categories) {
+        if (draggedItemId == null) {
+            val filtered = categories.filter { it.id != -1 }
+            categoryList.clear()
+            categoryList.addAll(filtered)
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -102,14 +108,15 @@ fun CategoryManagerBottomSheet(
             }
 
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                itemsIndexed(
+                items(
                     items = categoryList,
-                    key = { _, cat -> cat.id }
-                ) { index, category ->
-                    val isCurrentDragging = draggingIndex == index
+                    key = { it.id }
+                ) { category ->
+                    val isCurrentDragging = draggedItemId == category.id
                     val catColor = try {
                         Color(android.graphics.Color.parseColor(category.colorHex))
                     } catch (e: Exception) {
@@ -122,15 +129,29 @@ fun CategoryManagerBottomSheet(
                         label = "scale"
                     )
 
+                    val animatedElevation by animateFloatAsState(
+                        targetValue = if (isCurrentDragging) 24f else 0f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        label = "elevation"
+                    )
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .animateItem(
+                                fadeInSpec = null,
+                                fadeOutSpec = null,
+                                placementSpec = spring(
+                                    stiffness = Spring.StiffnessMediumLow,
+                                    dampingRatio = Spring.DampingRatioMediumBouncy
+                                )
+                            )
                             .zIndex(if (isCurrentDragging) 10f else 1f)
                             .graphicsLayer {
                                 translationY = if (isCurrentDragging) dragOffsetY else 0f
                                 scaleX = animatedScale
                                 scaleY = animatedScale
-                                shadowElevation = if (isCurrentDragging) 24f else 0f
+                                shadowElevation = animatedElevation
                             }
                             .then(
                                 if (isCurrentDragging) {
@@ -164,40 +185,49 @@ fun CategoryManagerBottomSheet(
                                     .pointerInput(category.id) {
                                         detectDragGestures(
                                             onDragStart = {
-                                                val foundIdx = categoryList.indexOfFirst { it.id == category.id }
-                                                if (foundIdx != -1) {
-                                                    draggingIndex = foundIdx
-                                                    dragOffsetY = 0f
-                                                    SoundManager.playTap()
-                                                }
+                                                draggedItemId = category.id
+                                                dragOffsetY = 0f
+                                                SoundManager.playTap()
                                             },
                                             onDrag = { change, dragAmount ->
                                                 change.consume()
                                                 dragOffsetY += dragAmount.y
-                                                val currentIdx = draggingIndex ?: return@detectDragGestures
-                                                val threshold = itemHeightPx * 0.5f
+                                                val activeId = draggedItemId ?: return@detectDragGestures
+                                                val currentIdx = categoryList.indexOfFirst { it.id == activeId }
+                                                if (currentIdx == -1) return@detectDragGestures
+
+                                                val currentItemInfo = lazyListState.layoutInfo.visibleItemsInfo.find { it.key == activeId }
+                                                val currentHeight = currentItemInfo?.size?.toFloat() ?: itemHeightPx
+                                                val threshold = currentHeight * 0.5f
 
                                                 if (dragOffsetY > threshold && currentIdx < categoryList.size - 1) {
+                                                    val targetItem = categoryList[currentIdx + 1]
+                                                    val targetItemInfo = lazyListState.layoutInfo.visibleItemsInfo.find { it.key == targetItem.id }
+                                                    val targetHeight = targetItemInfo?.size?.toFloat() ?: currentHeight
+
                                                     val item = categoryList.removeAt(currentIdx)
                                                     categoryList.add(currentIdx + 1, item)
-                                                    draggingIndex = currentIdx + 1
-                                                    dragOffsetY -= itemHeightPx
+                                                    dragOffsetY -= targetHeight
                                                     SoundManager.playTap()
                                                 } else if (dragOffsetY < -threshold && currentIdx > 0) {
+                                                    val targetItem = categoryList[currentIdx - 1]
+                                                    val targetItemInfo = lazyListState.layoutInfo.visibleItemsInfo.find { it.key == targetItem.id }
+                                                    val targetHeight = targetItemInfo?.size?.toFloat() ?: currentHeight
+
                                                     val item = categoryList.removeAt(currentIdx)
                                                     categoryList.add(currentIdx - 1, item)
-                                                    draggingIndex = currentIdx - 1
-                                                    dragOffsetY += itemHeightPx
+                                                    dragOffsetY += targetHeight
                                                     SoundManager.playTap()
                                                 }
                                             },
                                             onDragEnd = {
-                                                draggingIndex = null
+                                                val finalOrdered = categoryList.toList()
+                                                draggedItemId = null
                                                 dragOffsetY = 0f
-                                                onReorderDone(categoryList.toList())
+                                                onReorderDone(finalOrdered)
                                             },
                                             onDragCancel = {
-                                                draggingIndex = null
+                                                draggedItemId = null
                                                 dragOffsetY = 0f
                                             }
                                         )
