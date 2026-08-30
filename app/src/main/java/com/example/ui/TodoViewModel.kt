@@ -215,6 +215,16 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    fun updateAllCategoryOrders(orderedList: List<Category>) {
+        viewModelScope.launch {
+            orderedList.forEachIndexed { i, cat ->
+                if (cat.orderIndex != i) {
+                    repository.updateCategory(cat.copy(orderIndex = i))
+                }
+            }
+        }
+    }
+
     fun reorderCategories(fromIndex: Int, toIndex: Int) {
         viewModelScope.launch {
             val list = categories.value.filter { it.id != -1 }.toMutableList()

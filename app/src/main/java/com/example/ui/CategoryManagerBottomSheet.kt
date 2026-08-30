@@ -1,11 +1,14 @@
 package com.example.ui
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,17 +19,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.R
 import com.example.data.Category
-
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
+import com.example.util.SoundManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,11 +41,19 @@ fun CategoryManagerBottomSheet(
     onDeleteCategory: (Category) -> Unit,
     onAddCategoryClick: () -> Unit,
     onEditCategoryClick: (Category) -> Unit,
-    onReorder: (fromIndex: Int, toIndex: Int) -> Unit,
+    onReorderDone: (List<Category>) -> Unit,
     isDarkTheme: Boolean = true
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val filteredCategories = remember(categories) { categories.filter { it.id != -1 } }
+    val categoryList = remember(categories) {
+        mutableStateListOf<Category>().apply {
+            addAll(categories.filter { it.id != -1 })
+        }
+    }
+
+    var draggingIndex by remember { mutableStateOf<Int?>(null) }
+    var dragOffsetY by remember { mutableFloatStateOf(0f) }
+    val itemHeightPx = with(LocalDensity.current) { 62.dp.toPx() }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -56,7 +69,9 @@ fun CategoryManagerBottomSheet(
                 .padding(bottom = 28.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 14.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -68,9 +83,9 @@ fun CategoryManagerBottomSheet(
                         color = if (isDarkTheme) Color.White else Color(0xFF0F172A)
                     )
                     Text(
-                        text = "برای جابجایی، آیکون ☰ را لمس کرده و بکشید",
+                        text = "برای جابجایی، آیکون ☰ را گرفته و به بالا یا پایین بکشید",
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (isDarkTheme) Color.White.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.5f)
+                        color = if (isDarkTheme) Color.White.copy(alpha = 0.55f) else Color.Black.copy(alpha = 0.55f)
                     )
                 }
                 Button(
@@ -86,24 +101,44 @@ fun CategoryManagerBottomSheet(
                 }
             }
 
-            val itemHeightPx = with(LocalDensity.current) { 56.dp.toPx() }
-
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                itemsIndexed(items = filteredCategories, key = { _, cat: Category -> cat.id }) { index: Int, category: Category ->
+                itemsIndexed(
+                    items = categoryList,
+                    key = { _, cat -> cat.id }
+                ) { index, category ->
+                    val isCurrentDragging = draggingIndex == index
                     val catColor = try {
                         Color(android.graphics.Color.parseColor(category.colorHex))
                     } catch (e: Exception) {
                         MaterialTheme.colorScheme.primary
                     }
 
-                    var dragAccumulator by remember { mutableFloatStateOf(0f) }
+                    val animatedScale by animateFloatAsState(
+                        targetValue = if (isCurrentDragging) 1.04f else 1f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        label = "scale"
+                    )
 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .zIndex(if (isCurrentDragging) 10f else 1f)
+                            .graphicsLayer {
+                                translationY = if (isCurrentDragging) dragOffsetY else 0f
+                                scaleX = animatedScale
+                                scaleY = animatedScale
+                                shadowElevation = if (isCurrentDragging) 24f else 0f
+                            }
+                            .then(
+                                if (isCurrentDragging) {
+                                    Modifier
+                                        .shadow(12.dp, RoundedCornerShape(16.dp))
+                                        .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                                } else Modifier
+                            )
                             .glassCard(shape = RoundedCornerShape(16.dp), isDarkTheme = isDarkTheme)
                     ) {
                         Row(
@@ -115,29 +150,56 @@ fun CategoryManagerBottomSheet(
                             // Touch Reorder Drag Handle
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isDarkTheme) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.03f))
-                                    .pointerInput(category.id, index) {
+                                    .size(38.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        if (isCurrentDragging) {
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                                        } else if (isDarkTheme) {
+                                            Color.White.copy(alpha = 0.06f)
+                                        } else {
+                                            Color.Black.copy(alpha = 0.04f)
+                                        }
+                                    )
+                                    .pointerInput(category.id) {
                                         detectDragGestures(
-                                            onDrag = { change, dragAmount ->
-                                                change.consume()
-                                                dragAccumulator += dragAmount.y
-                                                val threshold = itemHeightPx * 0.7f
-                                                if (dragAccumulator > threshold) {
-                                                    if (index < filteredCategories.size - 1) {
-                                                        onReorder(index, index + 1)
-                                                        dragAccumulator = 0f
-                                                    }
-                                                } else if (dragAccumulator < -threshold) {
-                                                    if (index > 0) {
-                                                        onReorder(index, index - 1)
-                                                        dragAccumulator = 0f
-                                                    }
+                                            onDragStart = {
+                                                val foundIdx = categoryList.indexOfFirst { it.id == category.id }
+                                                if (foundIdx != -1) {
+                                                    draggingIndex = foundIdx
+                                                    dragOffsetY = 0f
+                                                    SoundManager.playTap()
                                                 }
                                             },
-                                            onDragEnd = { dragAccumulator = 0f },
-                                            onDragCancel = { dragAccumulator = 0f }
+                                            onDrag = { change, dragAmount ->
+                                                change.consume()
+                                                dragOffsetY += dragAmount.y
+                                                val currentIdx = draggingIndex ?: return@detectDragGestures
+                                                val threshold = itemHeightPx * 0.5f
+
+                                                if (dragOffsetY > threshold && currentIdx < categoryList.size - 1) {
+                                                    val item = categoryList.removeAt(currentIdx)
+                                                    categoryList.add(currentIdx + 1, item)
+                                                    draggingIndex = currentIdx + 1
+                                                    dragOffsetY -= itemHeightPx
+                                                    SoundManager.playTap()
+                                                } else if (dragOffsetY < -threshold && currentIdx > 0) {
+                                                    val item = categoryList.removeAt(currentIdx)
+                                                    categoryList.add(currentIdx - 1, item)
+                                                    draggingIndex = currentIdx - 1
+                                                    dragOffsetY += itemHeightPx
+                                                    SoundManager.playTap()
+                                                }
+                                            },
+                                            onDragEnd = {
+                                                draggingIndex = null
+                                                dragOffsetY = 0f
+                                                onReorderDone(categoryList.toList())
+                                            },
+                                            onDragCancel = {
+                                                draggingIndex = null
+                                                dragOffsetY = 0f
+                                            }
                                         )
                                     },
                                 contentAlignment = Alignment.Center
@@ -145,7 +207,13 @@ fun CategoryManagerBottomSheet(
                                 Icon(
                                     Icons.Default.DragHandle,
                                     contentDescription = null,
-                                    tint = if (isDarkTheme) Color.White.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.5f),
+                                    tint = if (isCurrentDragging) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else if (isDarkTheme) {
+                                        Color.White.copy(alpha = 0.65f)
+                                    } else {
+                                        Color.Black.copy(alpha = 0.55f)
+                                    },
                                     modifier = Modifier.size(20.dp)
                                 )
                             }

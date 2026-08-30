@@ -82,7 +82,7 @@ fun MainTodoScreen(
                 selectedCategoryForAction = cat
                 isEditCategoryNameDialogShown = true
             },
-            onReorder = { from, to -> viewModel.reorderCategories(from, to) },
+            onReorderDone = { newOrder -> viewModel.updateAllCategoryOrders(newOrder) },
             isDarkTheme = isDarkTheme
         )
     }
