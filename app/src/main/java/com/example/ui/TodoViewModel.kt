@@ -214,34 +214,13 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun moveCategoryUp(category: Category) {
-        viewModelScope.launch {
-            val list = categories.value.filter { it.id != -1 }.toMutableList()
-            val index = list.indexOfFirst { it.id == category.id }
-            if (index > 0) {
-                val temp = list[index - 1]
-                list[index - 1] = list[index]
-                list[index] = temp
-                
-                list.forEachIndexed { i, cat ->
-                    if (cat.orderIndex != i) {
-                        repository.updateCategory(cat.copy(orderIndex = i))
-                    }
-                }
-                SoundManager.playTap()
-            }
-        }
-    }
 
-    fun moveCategoryDown(category: Category) {
+    fun reorderCategories(fromIndex: Int, toIndex: Int) {
         viewModelScope.launch {
             val list = categories.value.filter { it.id != -1 }.toMutableList()
-            val index = list.indexOfFirst { it.id == category.id }
-            if (index != -1 && index < list.size - 1) {
-                val temp = list[index + 1]
-                list[index + 1] = list[index]
-                list[index] = temp
-                
+            if (fromIndex in list.indices && toIndex in list.indices && fromIndex != toIndex) {
+                val item = list.removeAt(fromIndex)
+                list.add(toIndex, item)
                 list.forEachIndexed { i, cat ->
                     if (cat.orderIndex != i) {
                         repository.updateCategory(cat.copy(orderIndex = i))

@@ -37,9 +37,11 @@ fun SettingsBottomSheet(
 ) {
     val isDarkTheme by viewModel.isDarkTheme.collectAsState()
     val appLanguage by viewModel.appLanguage.collectAsState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = if (isDarkTheme) Color(0xFF0F172A) else Color(0xFFF8FAFC)
     ) {

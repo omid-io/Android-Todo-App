@@ -82,8 +82,7 @@ fun MainTodoScreen(
                 selectedCategoryForAction = cat
                 isEditCategoryNameDialogShown = true
             },
-            onMoveUp = { cat -> viewModel.moveCategoryUp(cat) },
-            onMoveDown = { cat -> viewModel.moveCategoryDown(cat) },
+            onReorder = { from, to -> viewModel.reorderCategories(from, to) },
             isDarkTheme = isDarkTheme
         )
     }
