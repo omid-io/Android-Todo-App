@@ -40,3 +40,14 @@ tools/
 .DS_Store
 Thumbs.db
 
+# AI Agent & Internal Metadata
+AGENTS.md
+ARCHITECTURE.md
+DECISIONS.md
+KNOWN_ISSUES.md
+PROJECT_STATE.md
+metadata.json
+.agents/
+.gemini/
+*.log
+

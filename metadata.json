@@ -1,6 +1,0 @@
-{
-  "name": "کارهای من",
-  "description": "لیست کارهای روزمره شخصی با پشتیبانی کامل از تاریخ شمسی و ساعت زنده",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
