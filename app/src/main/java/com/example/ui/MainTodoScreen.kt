@@ -83,7 +83,8 @@ fun MainTodoScreen(
                 isEditCategoryNameDialogShown = true
             },
             onMoveUp = { cat -> viewModel.moveCategoryUp(cat) },
-            onMoveDown = { cat -> viewModel.moveCategoryDown(cat) }
+            onMoveDown = { cat -> viewModel.moveCategoryDown(cat) },
+            isDarkTheme = isDarkTheme
         )
     }
 

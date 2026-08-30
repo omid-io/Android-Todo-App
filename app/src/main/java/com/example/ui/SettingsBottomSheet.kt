@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -40,59 +41,78 @@ fun SettingsBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = if (isDarkTheme) Color(0xFF0F172A) else Color.White
+        containerColor = if (isDarkTheme) Color(0xFF0F172A) else Color(0xFFF8FAFC)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
+                .padding(bottom = 28.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
                 text = stringResource(R.string.settings),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
-                color = if (isDarkTheme) Color.White else Color.Black,
-                modifier = Modifier.padding(bottom = 4.dp)
+                color = if (isDarkTheme) Color.White else Color(0xFF0F172A),
+                modifier = Modifier.padding(bottom = 2.dp)
             )
 
-            // Theme Toggle
-            SettingsRow(
-                icon = if (isDarkTheme) Icons.Rounded.LightMode else Icons.Rounded.DarkMode,
-                title = stringResource(R.string.change_theme),
-                isDarkTheme = isDarkTheme,
-                action = {
-                    Switch(
-                        checked = isDarkTheme,
-                        onCheckedChange = { viewModel.toggleTheme() }
+            // Card 1: Appearance & Preferences
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDarkTheme)
+            ) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                    SettingsRow(
+                        icon = if (isDarkTheme) Icons.Rounded.DarkMode else Icons.Rounded.LightMode,
+                        title = stringResource(R.string.change_theme),
+                        isDarkTheme = isDarkTheme,
+                        action = {
+                            Switch(
+                                checked = isDarkTheme,
+                                onCheckedChange = { viewModel.toggleTheme() },
+                                modifier = Modifier.scale(0.85f)
+                            )
+                        }
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = if (isDarkTheme) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.05f)
+                    )
+
+                    SettingsRow(
+                        icon = Icons.Rounded.Language,
+                        title = stringResource(R.string.app_language),
+                        subtitle = if (appLanguage == "fa") "فارسی" else "English",
+                        isDarkTheme = isDarkTheme,
+                        onClick = {
+                            val nextLang = if (appLanguage == "fa") "en" else "fa"
+                            viewModel.setLanguage(nextLang)
+                        }
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = if (isDarkTheme) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.05f)
+                    )
+
+                    SettingsRow(
+                        icon = Icons.Rounded.Category,
+                        title = stringResource(R.string.manage_categories),
+                        isDarkTheme = isDarkTheme,
+                        onClick = onManageCategories
                     )
                 }
-            )
+            }
 
-            // Language Toggle
-            SettingsRow(
-                icon = Icons.Rounded.Language,
-                title = stringResource(R.string.app_language),
-                subtitle = if (appLanguage == "fa") "فارسی" else "English",
-                isDarkTheme = isDarkTheme,
-                onClick = {
-                    val nextLang = if (appLanguage == "fa") "en" else "fa"
-                    viewModel.setLanguage(nextLang)
-                }
-            )
-
-            // Category Management
-            SettingsRow(
-                icon = Icons.Rounded.Dashboard,
-                title = stringResource(R.string.manage_categories),
-                isDarkTheme = isDarkTheme,
-                onClick = onManageCategories
-            )
-
-            // Backup & Restore
+            // Card 2: Backup & Restore
             val context = LocalContext.current
             val filePickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
@@ -105,42 +125,62 @@ fun SettingsBottomSheet(
                 }
             }
 
-            SettingsRow(
-                icon = Icons.Rounded.CloudUpload,
-                title = stringResource(R.string.export_backup),
-                isDarkTheme = isDarkTheme,
-                onClick = { viewModel.exportBackup() }
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDarkTheme)
+            ) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                    SettingsRow(
+                        icon = Icons.Rounded.CloudUpload,
+                        title = stringResource(R.string.export_backup),
+                        isDarkTheme = isDarkTheme,
+                        onClick = { viewModel.exportBackup() }
+                    )
 
-            SettingsRow(
-                icon = Icons.Rounded.CloudDownload,
-                title = stringResource(R.string.import_backup),
-                isDarkTheme = isDarkTheme,
-                onClick = { filePickerLauncher.launch("*/*") }
-            )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = if (isDarkTheme) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.05f)
+                    )
 
-            // Check for Updates
+                    SettingsRow(
+                        icon = Icons.Rounded.CloudDownload,
+                        title = stringResource(R.string.import_backup),
+                        isDarkTheme = isDarkTheme,
+                        onClick = { filePickerLauncher.launch("*/*") }
+                    )
+                }
+            }
+
+            // Card 3: Updates & Version Info
             val updateResult by viewModel.updateCheckResult.collectAsState()
             val isCheckingUpdate by viewModel.isCheckingUpdate.collectAsState()
 
-            SettingsRow(
-                icon = Icons.Rounded.SystemUpdate,
-                title = stringResource(R.string.check_for_updates),
-                subtitle = stringResource(R.string.current_version_prefix) + " v${com.example.BuildConfig.VERSION_NAME}",
-                isDarkTheme = isDarkTheme,
-                action = if (isCheckingUpdate) {
-                    {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDarkTheme)
+            ) {
+                SettingsRow(
+                    icon = Icons.Rounded.SystemUpdate,
+                    title = stringResource(R.string.check_for_updates),
+                    subtitle = stringResource(R.string.current_version_prefix) + " v${com.example.BuildConfig.VERSION_NAME}",
+                    isDarkTheme = isDarkTheme,
+                    action = if (isCheckingUpdate) {
+                        {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    } else null,
+                    onClick = {
+                        viewModel.checkForUpdates(isManual = true)
                     }
-                } else null,
-                onClick = {
-                    viewModel.checkForUpdates(isManual = true)
-                }
-            )
+                )
+            }
 
             if (updateResult is UpdateCheckResult.NewVersionAvailable) {
                 val newVersion = (updateResult as UpdateCheckResult.NewVersionAvailable)
@@ -206,25 +246,37 @@ fun SettingsRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .padding(12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Spacer(modifier = Modifier.width(16.dp))
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = if (isDarkTheme) 0.15f else 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title, 
-                style = MaterialTheme.typography.titleMedium, 
+                style = MaterialTheme.typography.bodyMedium, 
                 fontWeight = FontWeight.Bold,
-                color = if (isDarkTheme) Color.White else Color.Black
+                color = if (isDarkTheme) Color.White else Color(0xFF0F172A)
             )
             if (subtitle != null) {
                 Text(
                     text = subtitle, 
                     style = MaterialTheme.typography.bodySmall, 
-                    color = if (isDarkTheme) Color.White.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.6f)
+                    color = if (isDarkTheme) Color.White.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.5f)
                 )
             }
         }
@@ -234,7 +286,8 @@ fun SettingsRow(
             Icon(
                 imageVector = Icons.Default.ChevronRight, 
                 contentDescription = null, 
-                tint = if (isDarkTheme) Color.White.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.3f)
+                tint = if (isDarkTheme) Color.White.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.25f),
+                modifier = Modifier.size(18.dp)
             )
         }
     }

@@ -168,34 +168,34 @@ fun AddTaskSheet(
         androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = if (isDark) Color(0xFF0F172A) else Color.White
+            color = if (isDark) Color(0xFF0B1120) else Color(0xFFF1F5F9)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .statusBarsPadding()
                     .navigationBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
                     .verticalScroll(rememberScrollState())
                     .imePadding()
             ) {
-                // Top Action Bar with Save Button
+                // Top Action Bar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 14.dp, top = 4.dp),
+                        .padding(bottom = 12.dp, top = 2.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         IconButton(
                             onClick = onDismiss,
                             modifier = Modifier
-                                .size(36.dp)
-                                .background(if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f), CircleShape)
+                                .size(38.dp)
+                                .background(if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f), CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
@@ -208,11 +208,11 @@ fun AddTaskSheet(
                             text = stringResource(if (taskToEdit != null) R.string.edit_task else R.string.add_task_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.ExtraBold,
-                            color = if (isDark) Color.White else Color.Black
+                            color = if (isDark) Color.White else Color(0xFF1E293B)
                         )
                     }
 
-                    // Top Primary Save Pill Button
+                    // Top Save Button
                     val isSaveActive = title.isNotBlank()
                     Button(
                         onClick = {
@@ -249,8 +249,8 @@ fun AddTaskSheet(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.White,
-                            disabledContainerColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.06f),
-                            disabledContentColor = if (isDark) Color.White.copy(alpha = 0.35f) else Color.Black.copy(alpha = 0.25f)
+                            disabledContainerColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f),
+                            disabledContentColor = if (isDark) Color.White.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.25f)
                         ),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
                         modifier = Modifier.height(38.dp)
@@ -265,72 +265,105 @@ fun AddTaskSheet(
                     }
                 }
 
-                // General Info Card
+                // 1. Unified Minimal Title & Notes Card
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).glassCard(shape = RoundedCornerShape(16.dp), isDarkTheme = isDark)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                        .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDark)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
-                            Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(R.string.main_info), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, color = if (isDark) Color.White else Color.Black)
-                        }
-
+                    Column(modifier = Modifier.padding(14.dp)) {
                         TextField(
                             value = title,
                             onValueChange = { title = it },
-                            label = { Text(stringResource(R.string.task_title_label), fontWeight = FontWeight.Medium, fontSize = 12.sp) },
+                            placeholder = { 
+                                Text(
+                                    stringResource(R.string.task_title_label),
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 15.sp,
+                                    color = if (isDark) Color.White.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.35f)
+                                ) 
+                            },
                             singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
-                            textStyle = MaterialTheme.typography.bodyMedium,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            ),
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = if (isDark) Color(0xFF1E293B) else Color(0xFFF8FAFC),
-                                unfocusedContainerColor = if (isDark) Color(0xFF0F172A).copy(alpha = 0.5f) else Color.White,
-                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 focusedTextColor = if (isDark) Color.White else Color.Black,
                                 unfocusedTextColor = if (isDark) Color.White else Color.Black
                             ),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).heightIn(min = 52.dp).border(1.dp, if(isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            thickness = 0.5.dp,
+                            color = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
                         )
 
                         TextField(
                             value = description,
                             onValueChange = { description = it },
-                            label = { Text(stringResource(R.string.task_desc_label), fontWeight = FontWeight.Medium, fontSize = 12.sp) },
-                            maxLines = 2,
-                            shape = RoundedCornerShape(12.dp),
-                            textStyle = MaterialTheme.typography.bodySmall,
+                            placeholder = { 
+                                Text(
+                                    stringResource(R.string.task_desc_label),
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 13.sp,
+                                    color = if (isDark) Color.White.copy(alpha = 0.35f) else Color.Black.copy(alpha = 0.3f)
+                                ) 
+                            },
+                            maxLines = 3,
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = if (isDark) Color(0xFF1E293B) else Color(0xFFF8FAFC),
-                                unfocusedContainerColor = if (isDark) Color(0xFF0F172A).copy(alpha = 0.5f) else Color.White,
-                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 focusedTextColor = if (isDark) Color.White else Color.Black,
                                 unfocusedTextColor = if (isDark) Color.White else Color.Black
                             ),
-                            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).border(1.dp, if(isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
 
-                // Category selection
+                // 2. Minimal Category Selection (Horizontal Scrolling Chips)
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).glassCard(shape = RoundedCornerShape(16.dp), isDarkTheme = isDark)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                        .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDark)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
-                            Icon(Icons.Default.Menu, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 10.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Category,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(R.string.task_category), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, color = if (isDark) Color.White else Color.Black)
+                            Text(
+                                stringResource(R.string.task_category),
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (isDark) Color.White else Color(0xFF1E293B)
+                            )
                         }
 
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            categories.forEach { category ->
+                            items(categories) { category ->
                                 val isSelected = category.id == selectedCategoryId
                                 val parsedColor = try {
                                     Color(android.graphics.Color.parseColor(category.colorHex))
@@ -338,67 +371,127 @@ fun AddTaskSheet(
                                     MaterialTheme.colorScheme.primary
                                 }
 
-                                Box(
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(10.dp))
+                                        .clip(RoundedCornerShape(12.dp))
                                         .background(
-                                            if (isSelected) parsedColor.copy(alpha = 0.2f)
-                                            else (if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.03f))
+                                            if (isSelected) parsedColor.copy(alpha = 0.18f)
+                                            else (if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f))
                                         )
                                         .border(
-                                            width = if (isSelected) 1.dp else 0.5.dp,
-                                            color = if (isSelected) parsedColor else Color.Transparent,
-                                            shape = RoundedCornerShape(10.dp)
+                                            width = if (isSelected) 1.5.dp else 0.5.dp,
+                                            color = if (isSelected) parsedColor else (if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)),
+                                            shape = RoundedCornerShape(12.dp)
                                         )
                                         .clickable { selectedCategoryId = category.id }
-                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
                                 ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(CircleShape)
+                                            .background(parsedColor)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = category.name,
-                                        color = if (isSelected) parsedColor else (if (isDark) Color.White.copy(alpha = 0.7f) else Color.Black.copy(alpha = 0.7f)),
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) parsedColor else (if (isDark) Color.White.copy(alpha = 0.8f) else Color(0xFF334155)),
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                         fontSize = 12.sp
                                     )
                                 }
                             }
 
-                            IconButton(
-                                onClick = { isAddCategoryDialogShown = true },
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(R.string.add_category_content_desc),
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                            item {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f))
+                                        .border(
+                                            width = 0.5.dp,
+                                            color = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.08f),
+                                            shape = RoundedCornerShape(12.dp)
+                                        )
+                                        .clickable { isAddCategoryDialogShown = true }
+                                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = stringResource(R.string.add_category_content_desc),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.new_category),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
-                // Subtasks creation section
+                // 3. Subtasks Section (Streamlined Checklist)
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).glassCard(shape = RoundedCornerShape(16.dp), isDarkTheme = isDark)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                        .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDark)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
-                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(R.string.subtasks_chain), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, color = if (isDark) Color.White else Color.Black)
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    stringResource(R.string.subtasks_chain),
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (isDark) Color.White else Color(0xFF1E293B)
+                                )
+                            }
+                            if (tempSubtasks.isNotEmpty()) {
+                                Text(
+                                    text = "${tempSubtasks.size.toPersianDigits()} ${stringResource(R.string.subtasks_suffix)}",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
 
+                        // Compact Add Subtask Row
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f))
+                                .border(
+                                    width = 0.5.dp,
+                                    color = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(horizontal = 10.dp, vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             TextField(
                                 value = newSubtaskTitle,
                                 onValueChange = { newSubtaskTitle = it },
-                                label = { Text(stringResource(R.string.subtask_title_label), fontSize = 12.sp) },
+                                placeholder = { Text(stringResource(R.string.subtask_title_label), fontSize = 12.sp) },
                                 singleLine = true,
                                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                                     imeAction = androidx.compose.ui.text.input.ImeAction.Done
@@ -411,33 +504,40 @@ fun AddTaskSheet(
                                         }
                                     }
                                 ),
-                                shape = RoundedCornerShape(12.dp),
-                                textStyle = MaterialTheme.typography.bodySmall,
+                                textStyle = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
                                 colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = if (isDark) Color(0xFF1E293B) else Color(0xFFF8FAFC),
-                                    unfocusedContainerColor = if (isDark) Color(0xFF0F172A).copy(alpha = 0.5f) else Color.White,
-                                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
                                     unfocusedIndicatorColor = Color.Transparent,
                                     focusedTextColor = if (isDark) Color.White else Color.Black,
                                     unfocusedTextColor = if (isDark) Color.White else Color.Black
                                 ),
-                                modifier = Modifier.weight(1f).heightIn(min = 48.dp).border(1.dp, if(isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                                modifier = Modifier.weight(1f)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Button(
+
+                            IconButton(
                                 onClick = {
                                     if (newSubtaskTitle.isNotBlank()) {
                                         tempSubtasks.add(Subtask(taskId = taskToEdit?.id ?: 0, title = newSubtaskTitle.trim()))
                                         newSubtaskTitle = ""
                                     }
                                 },
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.height(48.dp)
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(if (newSubtaskTitle.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Transparent)
                             ) {
-                                Text(stringResource(R.string.add), fontSize = 13.sp)
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = stringResource(R.string.add),
+                                    tint = if (newSubtaskTitle.isNotBlank()) Color.White else (if (isDark) Color.White.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.3f)),
+                                    modifier = Modifier.size(18.dp)
+                                )
                             }
                         }
 
+                        // Subtasks Item List
                         if (tempSubtasks.isNotEmpty()) {
                             Column(
                                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -447,26 +547,38 @@ fun AddTaskSheet(
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.03f))
-                                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.03f))
+                                            .padding(horizontal = 10.dp, vertical = 6.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = "${(index + 1).toPersianDigits()}- ${subtask.title}",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = if (isDark) Color.White else Color.Black
-                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(6.dp)
+                                                    .clip(CircleShape)
+                                                    .background(MaterialTheme.colorScheme.primary)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = subtask.title,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = if (isDark) Color.White else Color(0xFF1E293B)
+                                            )
+                                        }
                                         IconButton(
                                             onClick = { tempSubtasks.removeAt(index) },
-                                            modifier = Modifier.size(28.dp)
+                                            modifier = Modifier.size(24.dp)
                                         ) {
                                             Icon(
-                                                imageVector = Icons.Default.Delete,
+                                                imageVector = Icons.Default.Close,
                                                 contentDescription = stringResource(R.string.delete),
-                                                tint = MaterialTheme.colorScheme.error,
-                                                modifier = Modifier.size(16.dp)
+                                                tint = if (isDark) Color.White.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.35f),
+                                                modifier = Modifier.size(14.dp)
                                             )
                                         }
                                     }
@@ -476,24 +588,32 @@ fun AddTaskSheet(
                     }
                 }
 
-                // Reminder Activation Switch
+                // 4. Reminder & Alarm Section (Smart Expandable Card)
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).glassCard(shape = RoundedCornerShape(16.dp), isDarkTheme = isDark)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .glassCard(shape = RoundedCornerShape(18.dp), isDarkTheme = isDark)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(14.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                                Icon(
+                                    Icons.Default.Notifications,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = stringResource(R.string.reminder_alarm),
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (isDark) Color.White else Color.Black
+                                    color = if (isDark) Color.White else Color(0xFF1E293B)
                                 )
                             }
                             Switch(
@@ -504,43 +624,49 @@ fun AddTaskSheet(
                         }
 
                         if (isReminderEnabled) {
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                            // Date & Time Buttons
+                            // Date & Time Pills
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                val timeMillis = JalaliCalendar.j2g(jalaliYear, jalaliMonth, jalaliDay).timeInMillis
                                 Button(
                                     onClick = { isDatePickerShown = true },
+                                    shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                        containerColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f),
+                                        contentColor = if (isDark) Color.White else Color(0xFF1E293B)
                                     ),
-                                    modifier = Modifier.weight(1f).height(40.dp),
-                                    contentPadding = PaddingValues(0.dp)
+                                    modifier = Modifier.weight(1f).height(42.dp),
+                                    contentPadding = PaddingValues(horizontal = 8.dp)
                                 ) {
-                                    val timeMillis = JalaliCalendar.j2g(jalaliYear, jalaliMonth, jalaliDay).timeInMillis
+                                    Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "📅 " + JalaliCalendar.formatShamsiDateShort(timeMillis),
+                                        text = JalaliCalendar.formatShamsiDateShort(timeMillis),
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
 
+                                val formattedTime = String.format(java.util.Locale.US, "%02d:%02d", hour, minute).toPersianDigits()
                                 Button(
                                     onClick = { isTimePickerShown = true },
+                                    shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                        containerColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f),
+                                        contentColor = if (isDark) Color.White else Color(0xFF1E293B)
                                     ),
-                                    modifier = Modifier.weight(1f).height(40.dp),
-                                    contentPadding = PaddingValues(0.dp)
+                                    modifier = Modifier.weight(1f).height(42.dp),
+                                    contentPadding = PaddingValues(horizontal = 8.dp)
                                 ) {
-                                    val formattedTime = String.format(java.util.Locale.US, "%02d:%02d", hour, minute).toPersianDigits()
+                                    Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                                    Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = stringResource(R.string.clock_hour) + formattedTime,
-                                        fontSize = 11.sp,
+                                        text = formattedTime,
+                                        fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -548,13 +674,13 @@ fun AddTaskSheet(
 
                             Spacer(modifier = Modifier.height(12.dp))
 
-                            // Repeat choice
+                            // Repeat Choice
                             Text(
                                 text = stringResource(R.string.repeat_reminder),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 6.dp),
-                                color = if (isDark) Color.White.copy(alpha = 0.7f) else Color.Black.copy(alpha = 0.7f)
+                                color = if (isDark) Color.White.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.6f)
                             )
 
                             Row(

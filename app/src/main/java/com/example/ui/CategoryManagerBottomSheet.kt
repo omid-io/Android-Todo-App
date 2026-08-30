@@ -32,44 +32,44 @@ fun CategoryManagerBottomSheet(
     onAddCategoryClick: () -> Unit,
     onEditCategoryClick: (Category) -> Unit,
     onMoveUp: (Category) -> Unit,
-    onMoveDown: (Category) -> Unit
+    onMoveDown: (Category) -> Unit,
+    isDarkTheme: Boolean = true
 ) {
-    // We should ideally pass isDarkTheme here, but for now we can infer from MaterialTheme or common state
-    // Let's assume the surface color tells us enough or just use the system theme as fallback if not critical
-    // However, to be consistent with the user's request, I'll avoid system theme.
-    
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        dragHandle = { BottomSheetDefaults.DragHandle() }
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+        containerColor = if (isDarkTheme) Color(0xFF0F172A) else Color(0xFFF8FAFC)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
+                .padding(bottom = 28.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(R.string.manage_categories),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (isDarkTheme) Color.White else Color(0xFF0F172A)
                 )
                 Button(
                     onClick = onAddCategoryClick,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                    modifier = Modifier.height(36.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.add_new_category))
+                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(R.string.add_new_category), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
@@ -82,22 +82,20 @@ fun CategoryManagerBottomSheet(
                         MaterialTheme.colorScheme.primary
                     }
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .glassCard(shape = RoundedCornerShape(16.dp), isDarkTheme = isDarkTheme)
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(12.dp)
+                                .padding(horizontal = 14.dp, vertical = 10.dp)
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(14.dp)
                                     .clip(CircleShape)
                                     .background(catColor)
                             )
@@ -105,21 +103,58 @@ fun CategoryManagerBottomSheet(
                             Text(
                                 text = category.name,
                                 modifier = Modifier.weight(1f),
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (isDarkTheme) Color.White else Color(0xFF0F172A)
                             )
                             
-                            Row {
-                                IconButton(onClick = { onMoveUp(category) }) {
-                                    Icon(Icons.Default.ArrowUpward, contentDescription = stringResource(R.string.move_up), modifier = Modifier.size(20.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(
+                                    onClick = { onMoveUp(category) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.ArrowUpward,
+                                        contentDescription = stringResource(R.string.move_up),
+                                        tint = if (isDarkTheme) Color.White.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.5f),
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                 }
-                                IconButton(onClick = { onMoveDown(category) }) {
-                                    Icon(Icons.Default.ArrowDownward, contentDescription = stringResource(R.string.move_down), modifier = Modifier.size(20.dp))
+                                IconButton(
+                                    onClick = { onMoveDown(category) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.ArrowDownward,
+                                        contentDescription = stringResource(R.string.move_down),
+                                        tint = if (isDarkTheme) Color.White.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.5f),
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                 }
-                                IconButton(onClick = { onEditCategoryClick(category) }) {
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit), modifier = Modifier.size(20.dp))
+                                IconButton(
+                                    onClick = { onEditCategoryClick(category) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = stringResource(R.string.edit),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
                                 }
-                                IconButton(onClick = { onDeleteCategory(category) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                                IconButton(
+                                    onClick = { onDeleteCategory(category) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = stringResource(R.string.delete),
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(16.dp)
+                                    )
                                 }
                             }
                         }
