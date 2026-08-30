@@ -122,6 +122,8 @@ You can build and test the application directly using the Gradle wrapper:
 
 <br />
 
+<div dir="rtl">
+
 # 🇮🇷 کارهای من — اپلیکیشن مدیریت وظایف اندروید
 
 **«کارهای من / My Tasks»** یک اپلیکیشن سبک، آفلاین، امن و بسیار سریع برای مدیریت وظایف روزانه در سیستم‌عامل اندروید است. این برنامه با استفاده از **۱۰۰٪ Jetpack Compose** و زبان **کاتلین** بر پایه معماری مدرن **Glassmorphism (طراحی شیشه‌ای)** توسعه داده شده تا محیطی چشم‌نواز، روان و بدون لگ را برای کاربران به ارمغان آورد.
@@ -163,6 +165,8 @@ You can build and test the application directly using the Gradle wrapper:
 ## 🤝 مشارکت و حمایت
 
 اگر این پروژه برای شما مفید و کاربردی بوده است، با دادن یک **ستاره (⭐ Star)** در بالای صفحه گیت‌هاب از توسعه آن حمایت فرمایید!
+
+</div>
 
 <div align="center">
   <p>Made with ❤️ by Omid Zaferi • ساخته شده با ❤️ برای جامعه توسعه‌دهندگان</p>
