@@ -57,4 +57,13 @@
     <string name="backup_failed">خطا در تهیه بک‌آپ.</string>
     <string name="restore_success">داده‌ها با موفقیت بازیابی شدند!</string>
     <string name="restore_failed">فایل بک‌آپ نامعتبر است.</string>
+    <string name="check_for_updates">بررسی به‌روزرسانی</string>
+    <string name="current_version_prefix">نسخه فعلی:</string>
+    <string name="checking_update">در حال بررسی نسخه جدید...</string>
+    <string name="latest_version_installed">شما از آخرین نسخه برنامه استفاده می‌کنید (v%1$s) 🎉</string>
+    <string name="update_available_title">نسخه جدید موجود است! 🚀</string>
+    <string name="update_available_desc">نسخه %1$s منتشر شده است. مایلید آن را دانلود کنید؟</string>
+    <string name="download_update">دانلود نسخه جدید</string>
+    <string name="later">بعداً</string>
+    <string name="check_update_failed">خطا در اتصال به گیت‌هاب. لطفاً اینترنت را بررسی کنید.</string>
 </resources>

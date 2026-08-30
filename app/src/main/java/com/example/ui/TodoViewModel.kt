@@ -429,4 +429,129 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    private val _updateCheckResult = MutableStateFlow<UpdateCheckResult?>(null)
+    val updateCheckResult: StateFlow<UpdateCheckResult?> = _updateCheckResult.asStateFlow()
+
+    private val _isCheckingUpdate = MutableStateFlow(false)
+    val isCheckingUpdate: StateFlow<Boolean> = _isCheckingUpdate.asStateFlow()
+
+    fun clearUpdateResult() {
+        _updateCheckResult.value = null
+    }
+
+    fun checkForUpdates(isManual: Boolean = true) {
+        if (_isCheckingUpdate.value) return
+        _isCheckingUpdate.value = true
+        _updateCheckResult.value = null
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentVersionName = com.example.BuildConfig.VERSION_NAME
+                val url = java.net.URL("https://api.github.com/repos/omid-io/Android-Todo-App/releases/latest")
+                val connection = (url.openConnection() as java.net.HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    setRequestProperty("User-Agent", "MyTasks-Android-App")
+                    setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    connectTimeout = 8000
+                    readTimeout = 8000
+                }
+
+                if (connection.responseCode == 200) {
+                    val responseText = connection.inputStream.bufferedReader().use { it.readText() }
+                    val json = JSONObject(responseText)
+                    val tagName = json.optString("tag_name", "").trim()
+                    val remoteVersion = tagName.removePrefix("v").removePrefix("V").trim()
+                    val body = json.optString("body", "")
+                    val htmlUrl = json.optString("html_url", "https://github.com/omid-io/Android-Todo-App/releases/latest")
+                    
+                    var apkDownloadUrl = htmlUrl
+                    val assets = json.optJSONArray("assets")
+                    if (assets != null) {
+                        for (i in 0 until assets.length()) {
+                            val assetObj = assets.getJSONObject(i)
+                            val name = assetObj.optString("name", "")
+                            if (name.endsWith(".apk", ignoreCase = true)) {
+                                apkDownloadUrl = assetObj.optString("browser_download_url", htmlUrl)
+                                break
+                            }
+                        }
+                    }
+
+                    val isNewer = isVersionGreater(remoteVersion, currentVersionName)
+                    withContext(Dispatchers.Main) {
+                        _isCheckingUpdate.value = false
+                        if (isNewer) {
+                            _updateCheckResult.value = UpdateCheckResult.NewVersionAvailable(
+                                latestVersion = remoteVersion,
+                                releaseNotes = body,
+                                downloadUrl = apkDownloadUrl
+                            )
+                        } else {
+                            if (isManual) {
+                                _updateCheckResult.value = UpdateCheckResult.UpToDate(currentVersionName)
+                                Toast.makeText(
+                                    getApplication(),
+                                    getApplication<Application>().getString(R.string.latest_version_installed, currentVersionName),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        _isCheckingUpdate.value = false
+                        if (isManual) {
+                            _updateCheckResult.value = UpdateCheckResult.Error("HTTP ${connection.responseCode}")
+                            Toast.makeText(
+                                getApplication(),
+                                getApplication<Application>().getString(R.string.check_update_failed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    _isCheckingUpdate.value = false
+                    if (isManual) {
+                        _updateCheckResult.value = UpdateCheckResult.Error(e.localizedMessage ?: "Error")
+                        Toast.makeText(
+                            getApplication(),
+                            getApplication<Application>().getString(R.string.check_update_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isVersionGreater(remote: String, local: String): Boolean {
+        try {
+            val remoteParts = remote.split(".").mapNotNull { it.toIntOrNull() }
+            val localParts = local.split(".").mapNotNull { it.toIntOrNull() }
+            val maxLen = maxOf(remoteParts.size, localParts.size)
+            for (i in 0 until maxLen) {
+                val r = remoteParts.getOrElse(i) { 0 }
+                val l = localParts.getOrElse(i) { 0 }
+                if (r > l) return true
+                if (r < l) return false
+            }
+            return false
+        } catch (e: Exception) {
+            return remote != local
+        }
+    }
+}
+
+sealed class UpdateCheckResult {
+    data class UpToDate(val currentVersion: String) : UpdateCheckResult()
+    data class NewVersionAvailable(
+        val latestVersion: String,
+        val releaseNotes: String,
+        val downloadUrl: String
+    ) : UpdateCheckResult()
+    data class Error(val message: String) : UpdateCheckResult()
 }

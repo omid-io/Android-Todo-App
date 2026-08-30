@@ -118,6 +118,78 @@ fun SettingsBottomSheet(
                 isDarkTheme = isDarkTheme,
                 onClick = { filePickerLauncher.launch("*/*") }
             )
+
+            // Check for Updates
+            val updateResult by viewModel.updateCheckResult.collectAsState()
+            val isCheckingUpdate by viewModel.isCheckingUpdate.collectAsState()
+
+            SettingsRow(
+                icon = Icons.Rounded.SystemUpdate,
+                title = stringResource(R.string.check_for_updates),
+                subtitle = stringResource(R.string.current_version_prefix) + " v${com.example.BuildConfig.VERSION_NAME}",
+                isDarkTheme = isDarkTheme,
+                action = if (isCheckingUpdate) {
+                    {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                } else null,
+                onClick = {
+                    viewModel.checkForUpdates(isManual = true)
+                }
+            )
+
+            if (updateResult is UpdateCheckResult.NewVersionAvailable) {
+                val newVersion = (updateResult as UpdateCheckResult.NewVersionAvailable)
+                AlertDialog(
+                    onDismissRequest = { viewModel.clearUpdateResult() },
+                    title = {
+                        Text(
+                            text = stringResource(R.string.update_available_title),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    },
+                    text = {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = stringResource(R.string.update_available_desc, newVersion.latestVersion),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            if (newVersion.releaseNotes.isNotBlank()) {
+                                Text(
+                                    text = newVersion.releaseNotes.take(300),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                val intent = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    Uri.parse(newVersion.downloadUrl)
+                                )
+                                context.startActivity(intent)
+                                viewModel.clearUpdateResult()
+                            },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(stringResource(R.string.download_update), fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.clearUpdateResult() }) {
+                            Text(stringResource(R.string.later))
+                        }
+                    }
+                )
+            }
         }
     }
 }

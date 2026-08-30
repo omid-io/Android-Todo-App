@@ -57,4 +57,13 @@
     <string name="backup_failed">Failed to create backup.</string>
     <string name="restore_success">Data restored successfully!</string>
     <string name="restore_failed">Invalid backup file.</string>
+    <string name="check_for_updates">Check for Updates</string>
+    <string name="current_version_prefix">Current version:</string>
+    <string name="checking_update">Checking for updates...</string>
+    <string name="latest_version_installed">You are using the latest version (v%1$s) 🎉</string>
+    <string name="update_available_title">New Version Available! 🚀</string>
+    <string name="update_available_desc">Version %1$s is available. Would you like to download it?</string>
+    <string name="download_update">Download Update</string>
+    <string name="later">Later</string>
+    <string name="check_update_failed">Could not connect to GitHub. Please check your internet.</string>
 </resources>
