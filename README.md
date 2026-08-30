@@ -13,7 +13,7 @@
     <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg?style=flat&logo=jetpackcompose" alt="Jetpack Compose" /></a>
     <a href="https://developer.android.com/training/data-storage/room"><img src="https://img.shields.io/badge/Room-Persistence-3DDC84.svg?style=flat&logo=android" alt="Room Persistence" /></a>
     <a href="https://github.com/omid-io/Android-Todo-App/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-brightgreen.svg?style=flat&logo=githubactions" alt="CI/CD" /></a>
-    <a href="https://github.com/omid-io/Android-Todo-App/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.5-orange.svg?style=flat" alt="Latest Release" /></a>
+    <a href="https://github.com/omid-io/Android-Todo-App/releases/latest"><img src="https://img.shields.io/badge/Release-v1.0.6-orange.svg?style=flat" alt="Latest Release" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="License MIT" /></a>
   </p>
 </div>
@@ -116,7 +116,7 @@ You can build and test the application directly using the Gradle wrapper:
 
 | Release Version | Package File | Architecture | Min SDK | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **v1.0.5 (Latest)** | [`MyTasks-v1.0.5.apk`](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.5/MyTasks-v1.0.5.apk) | Universal | Android 7.0+ (API 24+) | ✅ GitHub CI/CD Passed |
+| **v1.0.6 (Latest)** | [`MyTasks-v1.0.6.apk`](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.6/MyTasks-v1.0.6.apk) | Universal | Android 7.0+ (API 24+) | ✅ GitHub CI/CD Passed |
 
 ---
 
@@ -131,9 +131,11 @@ You can build and test the application directly using the Gradle wrapper:
 ## ✨ ویژگی‌های برجسته برنامه
 
 * **🎨 رابط کاربری فوق‌مدرن شیشه‌ای (Glassmorphism):** استفاده از کارت‌های مات با افکت شیشه‌ای، دکمه شناور تمام‌شیشه‌ای، گرادینت‌های داینامیک Mesh Canvas و انیمیشن‌های روان ۶۰ فریم بر ثانیه.
+* **🗂️ جابجایی پیوسته دسته‌بندی‌ها (Drag & Drop):** سیستم پیشرفته مرتب‌سازی دسته‌بندی‌ها با هندل `☰`، انیمیشن‌های نرم فنری (Spring physics) و ذخیره آنی و اتمیک در دیتابیس.
 * **🗓️ تقویم دوگانه هوشمند (شمسی و میلادی):** پیاده‌سازی موتور بومی و مستقل تقویم جلالی با محاسبه دقیق سال‌های کبیسه برای بازه سال‌های ۱۴۰۰ تا ۱۴۲۰ و تبدیل خودکار اعداد به ارقام فارسی.
 * **⏰ یادآورها و آلارم‌های دقیق:** تنظیم هشدارهای زمان‌بندی‌شده بدون خطا با `AlarmManager` با امکان تکرار (روزانه، هفتگی و روزهای دلخواه) به همراه دکمه‌های اقدام سریع در اعلان‌ها («انجام شد» و «به تعویق انداختن ۱۰ دقیقه‌ای»).
 * **📝 ساب‌تسک‌ها و ثبت سریع با کیبورد:** امکان تعریف بی‌نهایت زیرمجموعه کار برای هر تسک با نوار پیشرفت درصد انجام و ثبت سریع با زدن کلید اینتر کیبورد.
+* **🔄 بررسی آنلاین آپدیت برنامه:** استعلام هوشمند نسخه‌های جدید از GitHub Releases API در بخش تنظیمات و هدایت به دانلود مستقیم APK.
 * **💾 پشتیبان‌گیری و بازیابی آفلاین:** خروجی گرفتن خودکار با ثبت دقیق تاریخ و ساعت (Timestamped Backup)، عدم جایگزینی فایل‌های قبلی و امکان بازگردانی در هر زمان.
 * **🚀 خط لوله انتشار تمام‌اتوماتیک (CI/CD):** یکپارچه‌سازی کامل با سرورهای ابری GitHub Actions با امضای دائمی Keystore برای نصب و آپدیت آسان روی نسخه‌های قبلی.
 
@@ -154,7 +156,7 @@ You can build and test the application directly using the Gradle wrapper:
 
 شما می‌توانید همواره جدیدترین نسخه پکیج نصب برنامه را مستقیماً از لینک زیر یا صفحه [**Releaseهای گیت‌هاب**](https://github.com/omid-io/Android-Todo-App/releases) دریافت کنید:
 
-👉 **[دانلود آخرین نسخه — MyTasks-v1.0.5.apk](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.5/MyTasks-v1.0.5.apk)**
+👉 **[دانلود آخرین نسخه — MyTasks-v1.0.6.apk](https://github.com/omid-io/Android-Todo-App/releases/download/v1.0.6/MyTasks-v1.0.6.apk)**
 
 ---
 
